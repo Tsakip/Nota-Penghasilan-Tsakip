@@ -115,6 +115,59 @@
     <!-- HIGH-PERFORMANCE LIGHTWEIGHT CANVAS PARTICLES & GLOW ORBS -->
     <canvas id="bgCanvas"></canvas>
 
+    <!-- ==================== SECURITY LOCK SCREEN ==================== -->
+    <template x-if="!isUnlocked">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100">
+            <div class="cyber-glass p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl border border-cyan-500/30">
+                
+                <!-- Icon Lock -->
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-pink-500 to-cyan-400 p-[2px] mx-auto mb-6 pulse-neon">
+                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-cyan-400">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002-2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <h2 class="text-lg font-orbitron font-extrabold text-slate-100 mb-1" x-text="hasStoredPassword ? 'MASUKKAN PASSWORD' : 'BUAT PASSWORD BARU'"></h2>
+                <p class="text-xs font-mono text-slate-400 mb-6" x-text="hasStoredPassword ? 'Sistem dikunci untuk privasi catatanmu.' : 'Atur password bebas (huruf/angka) untuk akses pertama.'"></p>
+
+                <form @submit.prevent="verifyOrSetupPassword" class="space-y-4">
+                    <div class="relative">
+                        <input :type="showPassword ? 'text' : 'password'" 
+                               x-model="inputPassword" 
+                               :placeholder="hasStoredPassword ? 'Ketik password...' : 'Buat password baru...'" 
+                               required autofocus
+                               class="w-full bg-slate-950 border border-purple-500/40 rounded-2xl px-4 py-3.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition pr-12 font-mono">
+                        
+                        <!-- Toggle Show/Hide Password -->
+                        <button type="button" @click="showPassword = !showPassword" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400 cursor-pointer">
+                            <svg x-show="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <svg x-show="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.07 10.07 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Error Warning -->
+                    <p x-show="passwordError" class="text-xs font-mono text-pink-400 font-medium" x-text="passwordErrorText"></p>
+
+                    <button type="submit" class="btn-cyber-primary w-full py-3.5 text-slate-950 font-orbitron font-extrabold text-sm rounded-2xl flex items-center justify-center space-x-2 cursor-pointer">
+                        <span x-text="hasStoredPassword ? 'BUKA SYSTEM' : 'SIMPAN & MASUK'"></span>
+                        <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    </button>
+                </form>
+
+                <template x-if="hasStoredPassword">
+                    <button @click="resetPasswordPrompt()" class="mt-4 text-[11px] font-mono text-slate-500 hover:text-cyan-400 transition cursor-pointer">
+                        [ Lupa password? Reset system ]
+                    </button>
+                </template>
+            </div>
+        </div>
+    </template>
+
     <!-- MAIN CONTAINER -->
     <main class="relative z-10 max-w-4xl mx-auto px-4 py-6 min-h-screen flex flex-col justify-between">
 
@@ -185,10 +238,17 @@
                             <p class="text-[10px] font-mono text-cyan-400 uppercase tracking-widest">● MBG Freelance Dashboard Active</p>
                         </div>
                     </div>
-                    <button @click="currentView = 'home'" class="px-3.5 py-1.5 text-xs font-semibold text-purple-300 cyber-glass rounded-xl flex items-center space-x-1.5 cursor-pointer">
-                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        <span>Beranda</span>
-                    </button>
+                    <div class="flex items-center space-x-2">
+                        <!-- Tombol Kunci Manual -->
+                        <button @click="lockApp()" class="px-3 py-1.5 text-xs font-mono font-semibold text-pink-400 bg-pink-500/10 border border-pink-500/30 rounded-xl hover:bg-pink-500/20 transition flex items-center space-x-1 cursor-pointer" title="Kunci Aplikasi">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002-2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <span>Lock</span>
+                        </button>
+                        <button @click="currentView = 'home'" class="px-3.5 py-1.5 text-xs font-semibold text-purple-300 cyber-glass rounded-xl flex items-center space-x-1.5 cursor-pointer">
+                            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            <span>Beranda</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- RINGKASAN SALDO -->
@@ -362,7 +422,7 @@
         </footer>
     </main>
 
-    <!-- HIGH PERFORMANCE CANVAS CYBER ANIMATION -->
+    <!-- HIGH PERFORMANCE CANVAS CYBER ANIMATION & ALPINE APP -->
     <script>
         window.onload = function() {
             const canvas = document.getElementById('bgCanvas');
@@ -375,7 +435,6 @@
                 height = canvas.height = window.innerHeight;
             });
 
-            // Dua orbs bercahaya cyberpunk (Purple & Cyan) untuk akselerasi smooth di mobile
             const orbs = [
                 { x: width * 0.25, y: height * 0.25, radius: 200, dx: 0.25, dy: 0.15, color: 'rgba(168, 85, 247, 0.15)' },
                 { x: width * 0.75, y: height * 0.75, radius: 240, dx: -0.2, dy: -0.25, color: 'rgba(6, 182, 212, 0.12)' }
@@ -413,6 +472,15 @@
                 filterStatus: 'semua',
                 showDeleteModal: false,
                 selectedIdToDelete: null,
+                
+                // Security / Password Lock States
+                isUnlocked: false,
+                hasStoredPassword: !!localStorage.getItem('tsaqif_app_password'),
+                inputPassword: '',
+                showPassword: false,
+                passwordError: false,
+                passwordErrorText: '',
+
                 form: {
                     keterangan: '',
                     nominal: ''
@@ -423,6 +491,47 @@
                     this.$watch('pemasukanList', (value) => {
                         localStorage.setItem('tsaqif_pemasukan', JSON.stringify(value));
                     });
+                },
+
+                verifyOrSetupPassword() {
+                    if (!this.inputPassword.trim()) return;
+
+                    const storedPass = localStorage.getItem('tsaqif_app_password');
+
+                    if (!storedPass) {
+                        // Setup Password Pertama Kali
+                        localStorage.setItem('tsaqif_app_password', this.inputPassword);
+                        this.hasStoredPassword = true;
+                        this.isUnlocked = true;
+                        this.inputPassword = '';
+                        this.passwordError = false;
+                    } else {
+                        // Verifikasi Password
+                        if (this.inputPassword === storedPass) {
+                            this.isUnlocked = true;
+                            this.inputPassword = '';
+                            this.passwordError = false;
+                        } else {
+                            this.passwordError = true;
+                            this.passwordErrorText = 'ACCESS DENIED: Password salah!';
+                            this.inputPassword = '';
+                        }
+                    }
+                },
+
+                lockApp() {
+                    this.isUnlocked = false;
+                    this.currentView = 'home';
+                },
+
+                resetPasswordPrompt() {
+                    if (confirm('Apakah kamu ingin mereset password system? Password lama akan dihapus.')) {
+                        localStorage.removeItem('tsaqif_app_password');
+                        this.hasStoredPassword = false;
+                        this.inputPassword = '';
+                        this.passwordError = false;
+                        alert('Password berhasil direset. Silakan buat password baru.');
+                    }
                 },
 
                 tambahPemasukan() {
