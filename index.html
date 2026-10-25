@@ -161,7 +161,7 @@
 
                 <template x-if="hasStoredPassword">
                     <button @click="resetPasswordPrompt()" class="mt-4 text-[11px] font-mono text-slate-500 hover:text-cyan-400 transition cursor-pointer">
-                        [ Lupa password? Reset system ]
+                        [ Ubah Password (Wajib Password Lama) ]
                     </button>
                 </template>
             </div>
@@ -525,12 +525,21 @@
                 },
 
                 resetPasswordPrompt() {
-                    if (confirm('Apakah kamu ingin mereset password system? Password lama akan dihapus.')) {
-                        localStorage.removeItem('tsaqif_app_password');
-                        this.hasStoredPassword = false;
-                        this.inputPassword = '';
-                        this.passwordError = false;
-                        alert('Password berhasil direset. Silakan buat password baru.');
+                    const oldPass = prompt('Masukkan password lama untuk mengubah password:');
+                    if (oldPass === null) return; // Batal
+
+                    const storedPass = localStorage.getItem('tsaqif_app_password');
+                    
+                    if (oldPass === storedPass) {
+                        const newPass = prompt('Masukkan password baru yang diinginkan:');
+                        if (newPass && newPass.trim()) {
+                            localStorage.setItem('tsaqif_app_password', newPass);
+                            alert('Password system berhasil diperbarui!');
+                        } else {
+                            alert('Password baru tidak boleh kosong.');
+                        }
+                    } else {
+                        alert('ACCESS DENIED: Password lama salah!');
                     }
                 },
 
